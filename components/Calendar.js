@@ -19,7 +19,7 @@ function Calendar(props) {
     }
     
     return (
-        <div className='flex items-center'>
+        <div className='flex items-center mb-3'>
             <DatePicker dateFormat={'dd-MM-yyyy'}
                         selected={date}
                         onChange={(newDate) => setDate(newDate)}

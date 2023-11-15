@@ -82,21 +82,22 @@ function Todo(props) {
       return response.json();
     })
     setIsEdited(!isEdited);
-  }
+  };
 
 // Display todo when being edited
 
   if(isEdited) {
     return (
-      <div className ='w-64 mb-4 bg-stone-100 border border-slate-500/75 rounded-lg p-5 flex flex-col justify-between'>
-      <div className = 'flex justify-between items-center mb-3'>
+      <div className ='w-64 mb-4 bg-white border border-slate-500/75 rounded-lg p-5 flex flex-col justify-between'>
+        <div className = 'flex justify-between items-center mb-3'>
+          <h2 className="font-bold text-slate-500">EDIT YOUR TODO</h2>
+          <svg  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" 
+                className="w-4 h-4 stroke-slate-500 hover:stroke-red-600 cursor-pointer"
+                onClick={()=> setIsEdited(!isEdited)}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </div>
         <Calendar onDateChange={handleDateChange} currentDate={date}/>
-        <svg  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" 
-              className="w-4 h-4 stroke-slate-500 hover:stroke-red-600 cursor-pointer"
-              onClick={()=> setIsEdited(!isEdited)}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </div>
       <input  defaultValue = {props.description}
               onChange={e=> setDescription(e.target.value)}
               maxLength={50}
@@ -122,10 +123,12 @@ function Todo(props) {
       </div>
     </div>
     )
+
     // Display todo component
+
   }else {
     return (
-      <div className ='w-64 h-24 mb-4 bg-stone-100 border border-slate-500/75 rounded-lg p-3 flex flex-col justify-between'>
+      <div className ='w-64 h-24 mb-4 bg-white border border-slate-500/75 rounded-lg p-3 flex flex-col justify-between'>
         <div className = 'flex justify-between items-center'>
           <p className="font-bold text-slate-500">{props.due_date}</p>
           <div className='flex'>
@@ -142,7 +145,7 @@ function Todo(props) {
           </div>
         </div>
         <div className = 'flex justify-start items-center'>
-          <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor "
+        <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor "
                 className={`w-5 h-5 mr-2  hover:fill-green-800 cursor-pointer ${isDone ? 'fill-green-800' : 'fill-slate-300'}`}
                 onClick={() => handleCheck()}>
             <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
