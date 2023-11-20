@@ -1,15 +1,15 @@
 import { useState } from "react";
 import Tag from "./Tag";
 import Calendar from './Calendar';
+import {forwardRef} from 'react';
 
-function NewTodo(props) {
+const NewTodo = forwardRef((props,ref)=> {
 
     const [description, setDescription] = useState('');
     const [date, setDate] = useState(new Date());
 
 // Create todo when pressing button SAVE
     const createTodo = () => {
-        console.log('click save button')
         fetch(`http://localhost:3000/api/todos`,{
           method: 'POST',
           headers: { 'Content-Type' : 'application/json'},
@@ -26,6 +26,7 @@ function NewTodo(props) {
         })
         setDescription('');
         setDate(new Date());
+        props.onRequestClose(false)
       };
 
 //Set new date from Calendar component
@@ -41,9 +42,9 @@ function NewTodo(props) {
     };
 
     return (
-        <div className ='w-64 bg-white border border-slate-500/75 rounded-lg p-5 flex flex-col justify-between'>
+        <div ref={ref} className ='w-64 mb-11 border border-indigo-600 rounded-lg p-5 flex flex-col justify-between'>
         <div className = 'flex justify-between items-center mb-3'>
-          <h2 className="font-bold text-slate-500">ADD A TODO</h2>
+          <h2 className="font-bold text-slate-500">Fill up to create a new todo</h2>
           <svg  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" 
                 className="w-4 h-4 stroke-slate-500 hover:stroke-red-600 cursor-pointer"
                 onClick={()=>handleClose()}>
@@ -71,12 +72,12 @@ function NewTodo(props) {
         </svg>
       </div>
       <div className="flex justify-evenly">
-        <button className=" w-1/3 shadow rounded-full p-2 bg-cyan-600 hover:bg-cyan-800 text-stone-100 font-bold"
+        <button className=" w-1/3 shadow rounded-full p-2 bg-indigo-600 hover:bg-indigo-800 text-stone-100 font-bold"
                 onClick={() => createTodo()}>SAVE</button>
       </div>
     </div>
     );
-  }
+  });
   
   export default NewTodo;
   

@@ -2,7 +2,7 @@ import DatePicker from 'react-datepicker';
 import { useState } from "react";
 import 'react-datepicker/dist/react-datepicker.css';
 
-const moment = require('moment');
+import moment from 'moment';
 import 'moment/locale/es';
 
 function Calendar(props) {
