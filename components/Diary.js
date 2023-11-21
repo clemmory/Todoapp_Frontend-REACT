@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import moment from "moment";
-import TodoTest from "./TodoTest";
+import Todo from "./Todo";
+import ModalTodo from './ModalTodo';
 
 function Diary() {
 
-    const [selectedDate, setSelectedDate] = useState(new Date());
     const [currentDate, setCurrentDate] = useState(moment().startOf('month'));
     const [todosData, setTodosData] = useState([]);
+    const [today, setToday]= useState(new Date());
 
     // Get all the todos registered in database au lancement de la page
     useEffect (() => {
@@ -18,6 +19,7 @@ function Diary() {
             setTodosData(data);
             })
     }, []);
+    
     
     // Verifier si le mois precedent est decembre de l'annee precedente.
     const handlePrevMonth = () => {
@@ -39,11 +41,8 @@ function Diary() {
         }
     };
 
-    const handleSelectionDate = () => {
-        console.log('selected date', selectedDate)
-    };
 
-    const generateCalendar = () => {
+    const generateTwoWeeksCalendar = () => {
         const startOfMonth = currentDate.clone().startOf('month').startOf('week');
         const endOfMonth = currentDate.clone().endOf('month').endOf('week');
         const calendar = [];
@@ -51,68 +50,89 @@ function Diary() {
 
         for (let day = startOfMonth.clone(); day.isBefore(endOfMonth); day.add(1, 'day')) {
             const isInCurrentMonth = day.isSame(currentDate, 'month');
+            const isCurrentDate = day.isSame(today,'day')
+
 
             week.push({
                 date:day.clone(), 
-                isInCurrentMonth: isInCurrentMonth, 
+                isInCurrentMonth: isInCurrentMonth,
+                isCurrentDate : isCurrentDate,
                 todos: [],});
 
             if (week.length === 7 || day.isSame(endOfMonth, 'day')) {
-            calendar.push(week);
-            week = [];
+                calendar.push(week);
+                week = [];
+        
           }
-        }
+        };
 
+        // Associer les todos correspondantes a chaque jour du calendrier
         calendar.forEach((week, weekIndex) => {
-                for (let items of week) {
-                    const formatedDate = items.date.format('DD MM YYYY')
-                    const todosForDay = todosData.find(e => moment(e.due_date).format('DD MM YYYY') === formatedDate);
-                    if (todosForDay) {
-                        items.todos = {
-                            id:todosForDay.id, 
-                            description:todosForDay.description, 
-                            status:todosForDay.status,
-                            due_date:todosForDay.due_date,
-                        }
-                        console.log('test',items)
-                    }                     
-                }
-        })
-
+            for (let items of week) {
+                const formatedDate = items.date.format('L')
+                const todosForDay = todosData.filter(e => moment(e.due_date).format('L') === formatedDate);
+                if (todosForDay.length > 0) {
+                    items.todos= todosForDay.map(todo => ({
+                        id:todo.id,
+                        description:todo.description, 
+                        status:todo.status,
+                        due_date:todo.due_date,
+                    }))
+                }  
+            } 
+        });
         return calendar;
     };
 
-    const calendar = generateCalendar();
+    const calendar = generateTwoWeeksCalendar();
 
 
     const calendarDisplay = calendar.map((week,weekIndex) => {
         return (
             <React.Fragment key={weekIndex}>
                 {week.map((dayInfo,dayIndex) => { 
-                    const {date, isInCurrentMonth, todos} = dayInfo;
+                    const {date, isInCurrentMonth, isCurrentDate, todos} = dayInfo;
+                    let todosToDisplay;
+
+                    // Display todos for the day
+                    if (todos.length > 0) {
+                        todosToDisplay = todos.map((todo, todoIndex) => {
+                        return ( <Todo key={todoIndex} description={todo.description} {...todo}/>);
+                        });
+                    }
+                    // Display empty lines 
+                    const emptyLines = Array.from({length: (3-todos.length)}).map((_, index) => {
+                        return ( <div className = 'flex justify-start items-center border-b border-slate-200 mb-3 mt-3' key={index}>
+                                    <svg    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" 
+                                            className="w-4 h-4 mb-3 stroke-slate-200 hover:cursor-pointer hover:stroke-sky-500"
+                                            onClick={() => handleAddTodo()}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                    </svg>
+                                </div>)
+                    });
                     return (
                         <div key={dayIndex}>
-                            <div className={`flex justify-between text-base border-b mb-2 ${isInCurrentMonth ? 'text-slate-600  border-slate-600 cursor-pointer hover:border-indigo-600 hover:text-indigo-600 hover:border-b-2' : 'text-gray-400'}`}>
-                                <p className="font-bold  mr-4 mb-2" onClick={()=> handleSelectionDate()}>{date.format('DD')}.</p>
-                                <p className="">{date.format('dddd')}</p>
+                            <div className={`flex justify-between text-xl border-b-2 ${isCurrentDate ? 'border-b-2 border-indigo-600' : isInCurrentMonth ? 'text-slate-600  border-slate-600' : 'text-gray-400'}`}>
+                                <p className={`font-bold  mr-4 mb-2 ${isCurrentDate ? 'text-indigo-600 border-indigo-600' : ''}`}>{date.format('DD')}.</p>
+                                <p className={` ${isCurrentDate ? 'text-indigo-600' : ''}`}>{date.format('dddd')}</p>
                             </div>
-                            <TodoTest description={todos.description} {...dayInfo}/>
+                            {todosToDisplay}
+                            {emptyLines}
                         </div>
                         )
                 })}
             </React.Fragment> 
         )});
     
-
     return (
-    <div className="bg-white rounded-lg p-5 min-w-full">
-        <div className="flex justify-start items-center mb-5">
-            <svg    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 stroke-indigo-600 mr-4  hover:stroke-slate-500 cursor-pointer"
+    <div className="bg-white rounded-lg p-8 min-w-full">
+        <div className="flex justify-start items-center mb-8">
+            <svg    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 stroke-indigo-600 mr-4  hover:stroke-slate-500 cursor-pointer"
                     onClick={()=>handlePrevMonth()} >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
             </svg>
-            <h2 className=" font-bold text-xl text-indigo-600">{currentDate.format('MMMM YYYY')}</h2>
-            <svg    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 stroke-indigo-600 ml-4 hover:stroke-slate-500 cursor-pointer"
+            <h2 className=" font-bold text-3xl text-indigo-600">{currentDate.format('MMMM YYYY')}</h2>
+            <svg    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 stroke-indigo-600 ml-4 hover:stroke-slate-500 cursor-pointer"
                     onClick={()=>handleNextMonth()}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
             </svg>
@@ -120,7 +140,7 @@ function Diary() {
       <div className='grid grid-cols-7 gap-4'>
         {calendarDisplay}
       </div>
-      </div>
+    </div>
     );
   }
   

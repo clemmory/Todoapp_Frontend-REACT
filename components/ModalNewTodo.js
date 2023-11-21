@@ -1,9 +1,8 @@
 import { useState } from "react";
-import Tag from "./Tag";
-import Calendar from './Calendar';
-import {forwardRef} from 'react';
+// import Tag from "./Tag";
+import CalendarPicker from './CalendarPicker';
 
-const NewTodo = forwardRef((props,ref)=> {
+function ModalNewTodo (props) {
 
     const [description, setDescription] = useState('');
     const [date, setDate] = useState(new Date());
@@ -51,7 +50,7 @@ const NewTodo = forwardRef((props,ref)=> {
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </div>
-        <Calendar onDateChange={handleDateChange} currentDate={date}/>
+        <CalendarPicker onDateChange={handleDateChange} currentDate={date}/>
       <input  placeholder = "Type your todo's description"
               onChange={e=> setDescription(e.target.value)}
               maxLength={50}
@@ -77,7 +76,7 @@ const NewTodo = forwardRef((props,ref)=> {
       </div>
     </div>
     );
-  });
+  };
   
-  export default NewTodo;
+  export default ModalNewTodo;
   
