@@ -25,7 +25,13 @@ function ModalNewTodo (props) {
           }
           return response;
         })
-        props.onRequestClose(false)
+        .then (() => {
+          props.onClose(false);
+          props.fetchtodos();
+          })
+          .catch (error => {
+              console.log('Error updating todo',error)
+          });
       };
 
 //Set new date from Calendar component

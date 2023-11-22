@@ -11,18 +11,23 @@ function Diary() {
     const [isModalNewTodo, setIsModalNewTodo] = useState(false);
     const [selectedDate, setSelectedDate] = useState( new Date ());
 
-
+    const fetchtodos = () => {
+        fetch('http://localhost:3000/api/todos')
+                .then(response => response.json ())
+                .then(data => {
+                    // Sort todos by date
+                    data.sort((a, b) => new Date(a.due_date) - new Date(b.due_date));
+                    setTodosData(data);
+                })
+                .catch(error => {
+                    console.log('error getting datas', error)
+                })
+        };
+    
     // Get all the todos registered in database au lancement de la page
     useEffect (() => {
-        fetch('http://localhost:3000/api/todos')
-            .then(response => response.json ())
-            .then(data => {
-            // Sort todos by date
-            data.sort((a, b) => new Date(a.due_date) - new Date(b.due_date));
-            setTodosData(data);
-            })
-    }, []);
-    
+        fetchtodos();
+    }, [])
     
     // Verifier si le mois precedent est decembre de l'annee precedente.
     const handlePrevMonth = () => {
@@ -110,7 +115,7 @@ function Diary() {
                     // Display todos for the day
                     if (todos.length > 0) {
                         todosToDisplay = todos.map((todo, todoIndex) => {
-                        return ( <Todo key={todoIndex} description={todo.description} {...todo}/>);
+                        return ( <Todo key={todoIndex} description={todo.description} {...todo} fetchtodos={fetchtodos}/>);
                         });
                     }
                     // Display empty lines 
@@ -154,7 +159,7 @@ function Diary() {
                 {calendarDisplay}
             </div>
             <div>
-                {isModalNewTodo ? <ModalNewTodo onRequestClose = {handleClose} due_date = {selectedDate} /> : null}
+                {isModalNewTodo ? <ModalNewTodo onClose = {handleClose} due_date = {selectedDate} fetchtodos={fetchtodos}/> : null}
             </div>
         </div>
     );

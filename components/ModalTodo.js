@@ -17,7 +17,7 @@ function ModalTodo(props) {
 
     // Save changes done in db
     const saveChanges = () => {
-            fetch(`http://localhost:3000/api/todos/${props.id}`,{
+            fetch (`http://localhost:3000/api/todos/${props.id}`,{
                 method: 'PUT',
                 headers: { 'Content-Type' : 'application/json'},
                 body: JSON.stringify({due_date: date, description: description, status: props.status})
@@ -29,7 +29,14 @@ function ModalTodo(props) {
                     console.log('data updated')
                     return response.json();
                 })
+                .then (() => {
                 props.onClose(false);
+                props.fetchtodos();
+                })
+                .catch (error => {
+                    console.log('Error updating todo',error)
+                });
+                
       };
 
     //Set new date from Calendar component

@@ -7,10 +7,10 @@ function Todo(props) {
 
     const [isDone, setIsDone] = useState(props.status);
     const [isModal, setIsModal] = useState(false);
+    const fetchtodos = props.fetchtodos;
     
     // Change status of todo (change status to true or false)
     const handleCheck = () => {
-        console.log('click check')
         fetch(`http://localhost:3000/api/todos/${props.id}`,{
             method: 'PUT',
             headers: { 'Content-Type' : 'application/json'},
@@ -22,10 +22,11 @@ function Todo(props) {
             if (!response.ok) {
                 throw new Error ('Update error')
             }
-        setIsDone(!isDone)
-        console.log('data updated')
-        return response.json();
         })
+        .then (() => {
+            fetchtodos();
+        })
+        setIsDone(!isDone)        
     };
 
     // Delete todo from db
@@ -33,7 +34,10 @@ function Todo(props) {
         fetch(`http://localhost:3000/api/todos/${props.id}`,{
             method: 'DELETE',
         })
-        .then(setIsModal(false))
+        .then (() => {
+            fetchtodos();
+        })
+        setIsModal(false) 
     };
 
     // Show editable fields
@@ -47,7 +51,7 @@ function Todo(props) {
     };
 
     if (isModal) {
-        return ( <ModalTodo due_date = {moment(props.due_date).format('L')} description={props.description} onClose={handleClose} id={props.id} handleDeleteTodo={handleDelete}/>)
+        return ( <ModalTodo due_date = {moment(props.due_date).format('L')} description={props.description} onClose={handleClose} id={props.id} handleDeleteTodo={handleDelete} fetchtodos={fetchtodos} status={props.status}/>)
 
     };
         return (
