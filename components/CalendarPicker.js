@@ -25,6 +25,7 @@ function CalendarPicker (props) {
                         onChange={(newDate) => setDate(newDate)}
                         input={true}
                         onCalendarClose={handleClose}
+                        name='date-picker'
                         className='appearance-none shadow border rounded p-2 font-bold text-slate-600 bg-white outline-sky-500'/>
                 <svg    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" 
                         className="relative right-6 w-4 h-4 stroke-slate-500">

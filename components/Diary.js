@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import moment from "moment";
 import Todo from "./Todo";
-import ModalTodo from './ModalTodo';
+import ModalNewTodo from "./ModalNewTodo";
 
 function Diary() {
 
     const [currentDate, setCurrentDate] = useState(moment().startOf('month'));
     const [todosData, setTodosData] = useState([]);
     const [today, setToday]= useState(new Date());
+    const [isModalNewTodo, setIsModalNewTodo] = useState(false);
+    const [selectedDate, setSelectedDate] = useState( new Date ());
+
 
     // Get all the todos registered in database au lancement de la page
     useEffect (() => {
@@ -41,8 +44,9 @@ function Diary() {
         }
     };
 
-
+    // Affichage calendrier
     const generateTwoWeeksCalendar = () => {
+
         const startOfMonth = currentDate.clone().startOf('month').startOf('week');
         const endOfMonth = currentDate.clone().endOf('month').endOf('week');
         const calendar = [];
@@ -51,7 +55,6 @@ function Diary() {
         for (let day = startOfMonth.clone(); day.isBefore(endOfMonth); day.add(1, 'day')) {
             const isInCurrentMonth = day.isSame(currentDate, 'month');
             const isCurrentDate = day.isSame(today,'day')
-
 
             week.push({
                 date:day.clone(), 
@@ -62,7 +65,6 @@ function Diary() {
             if (week.length === 7 || day.isSame(endOfMonth, 'day')) {
                 calendar.push(week);
                 week = [];
-        
           }
         };
 
@@ -80,12 +82,17 @@ function Diary() {
                     }))
                 }  
             } 
-        });
+        })
         return calendar;
     };
 
     const calendar = generateTwoWeeksCalendar();
 
+
+
+    const handleClose = (status) => {
+        setIsModalNewTodo(status)
+    };
 
     const calendarDisplay = calendar.map((week,weekIndex) => {
         return (
@@ -93,6 +100,12 @@ function Diary() {
                 {week.map((dayInfo,dayIndex) => { 
                     const {date, isInCurrentMonth, isCurrentDate, todos} = dayInfo;
                     let todosToDisplay;
+
+                    const handleAddTodo = () => {
+                        setIsModalNewTodo(!isModalNewTodo);
+                        console.log('dayinfo', dayInfo.date)
+                        setSelectedDate( dayInfo.date)
+                    };
 
                     // Display todos for the day
                     if (todos.length > 0) {
@@ -125,22 +138,25 @@ function Diary() {
         )});
     
     return (
-    <div className="bg-white rounded-lg p-8 min-w-full">
-        <div className="flex justify-start items-center mb-8">
-            <svg    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 stroke-indigo-600 mr-4  hover:stroke-slate-500 cursor-pointer"
-                    onClick={()=>handlePrevMonth()} >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-            </svg>
-            <h2 className=" font-bold text-3xl text-indigo-600">{currentDate.format('MMMM YYYY')}</h2>
-            <svg    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 stroke-indigo-600 ml-4 hover:stroke-slate-500 cursor-pointer"
-                    onClick={()=>handleNextMonth()}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-            </svg>
-      </div>
-      <div className='grid grid-cols-7 gap-4'>
-        {calendarDisplay}
-      </div>
-    </div>
+        <div className="bg-white rounded-lg p-8 min-w-full">
+            <div className="flex justify-start items-center mb-8">
+                <svg    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 stroke-indigo-600 mr-4  hover:stroke-slate-500 cursor-pointer"
+                        onClick={()=>handlePrevMonth()} >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                </svg>
+                <h2 className=" font-bold text-3xl text-indigo-600">{currentDate.format('MMMM YYYY')}</h2>
+                <svg    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 stroke-indigo-600 ml-4 hover:stroke-slate-500 cursor-pointer"
+                        onClick={()=>handleNextMonth()}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                </svg>
+            </div>
+            <div className='grid grid-cols-7 gap-4'>
+                {calendarDisplay}
+            </div>
+            <div>
+                {isModalNewTodo ? <ModalNewTodo onRequestClose = {handleClose} due_date = {selectedDate} /> : null}
+            </div>
+        </div>
     );
   }
   

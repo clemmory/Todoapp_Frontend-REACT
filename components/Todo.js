@@ -2,15 +2,11 @@ import { useState } from "react";
 import moment from "moment";
 import 'moment/locale/es';
 import ModalTodo from "./ModalTodo";
-import ModalNewTodo from "./ModalNewTodo";
 
 function Todo(props) {
 
     const [isDone, setIsDone] = useState(props.status);
     const [isModal, setIsModal] = useState(false);
-    const [isModalNewTodo, setIsModalNewTodo] = useState(false);
-
-
     
     // Change status of todo (change status to true or false)
     const handleCheck = () => {
@@ -34,11 +30,10 @@ function Todo(props) {
 
     // Delete todo from db
     const handleDelete = () => {
-        console.log('click bin')
         fetch(`http://localhost:3000/api/todos/${props.id}`,{
             method: 'DELETE',
         })
-        .then (console.log('Delete successful'))
+        .then(setIsModal(false))
     };
 
     // Show editable fields
@@ -51,15 +46,10 @@ function Todo(props) {
         setIsModal(status)
     };
 
-    const showModal = () => {
-        if (isModal) {
-            return ( <ModalTodo due_date = {moment(props.due_date).format('L')} description={props.description} onClose={handleClose} id={props.id}/>
-            )
-        }else if (isModalNewTodo) {
-            return ( <ModalNewTodo />)
-        }
-    };
+    if (isModal) {
+        return ( <ModalTodo due_date = {moment(props.due_date).format('L')} description={props.description} onClose={handleClose} id={props.id} handleDeleteTodo={handleDelete}/>)
 
+    };
         return (
             <div>
                 <div className="border-b  border-slate-200 mb-3 mt-3">
@@ -73,11 +63,11 @@ function Todo(props) {
                         </div>
                         <div    className= {`text-xs ${isDone ? 'line-through' : 'no-underline'} truncate cursor-pointer`}
                                 onClick={() => handleEdit()} >
-                            {props.description}
+                                {props.description}
                         </div>
                     </div>
                 </div>
-                {showModal}
+                {isModal}
             </div>
             
         )
