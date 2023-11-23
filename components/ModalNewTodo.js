@@ -42,16 +42,16 @@ function ModalNewTodo (props) {
 
 // Close newTodo window
     const handleClose = () => {
-        props.onRequestClose(false)
+        props.onClose(false);
     };
 
     return (
       <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-slate-600 bg-opacity-70 ">
-        <div className ='w-96 mb-4 bg-white border shadow rounded-lg p-8 flex flex-col'>
+        <div className ='w-80 sm:w-96 mb-4 bg-white border shadow rounded-lg p-8 flex flex-col'>
           <div className = 'flex justify-between items-center mb-5'>
-            <h2 className="font-bold text-2xl text-indigo-600">Create a new todo</h2>
+            <h2 className="font-bold text-xl sm:text-2xl text-indigo-600">Create a new todo</h2>
             <svg  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" 
-                  className="w-4 h-4 stroke-slate-500 hover:stroke-red-600 cursor-pointer"
+                  className="w-6 h-6 stroke-slate-500 hover:stroke-red-600 cursor-pointer"
                   onClick={()=>handleClose()}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -71,7 +71,7 @@ function ModalNewTodo (props) {
                   name = 'tag names'
                   className="shadow border rounded p-2 mb-5 text-slate-600 font-bold outline-sky-500"/>
           <div className="flex justify-evenly">
-            <button className=" w-1/3 shadow rounded-full p-3 bg-indigo-600 hover:bg-indigo-800 text-stone-100 font-bold"
+            <button className=" w-1/3 shadow rounded-full p-2 bg-indigo-600 hover:bg-indigo-800 text-stone-100 font-bold text-base"
                     onClick={() => createTodo()}>SAVE</button>
           </div>
         </div>

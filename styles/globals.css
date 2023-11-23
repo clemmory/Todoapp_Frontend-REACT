@@ -7,3 +7,9 @@
 .radial-blue {
     background: radial-gradient(rgb(203 213 225),rgb(100 116 139))
 }
+
+/* width */
+::-webkit-scrollbar {
+    width: 0px;
+}
+ 

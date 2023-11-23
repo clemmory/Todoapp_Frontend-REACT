@@ -1,7 +1,6 @@
 import DatePicker from 'react-datepicker';
 import { useState } from "react";
 import 'react-datepicker/dist/react-datepicker.css';
-
 import moment from 'moment';
 import 'moment/locale/es';
 

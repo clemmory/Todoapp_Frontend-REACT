@@ -12,6 +12,9 @@ module.exports = {
         'montserrat': ['Montserrat','sans-serif'],
         'title': ['Readex Pro', 'sans-serif']
       },
+      screens : {
+        'xs': '430px'
+      }
     },
   },
   plugins: [],
