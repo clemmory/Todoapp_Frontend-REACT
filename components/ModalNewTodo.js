@@ -12,7 +12,7 @@ function ModalNewTodo (props) {
 
 // Create todo when pressing button SAVE
     const createTodo = () => {
-        fetch(`http://localhost:3000/api/todos`,{
+        fetch(`http://localhost:3000/api/todos/`,{
           method: 'POST',
           headers: { 'Content-Type' : 'application/json'},
           body: JSON.stringify({due_date: moment(date).format('L'),

@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import moment from "moment";
 import 'moment/locale/es';
 import Todo from "./Todo";
 import ModalNewTodo from "./ModalNewTodo";
+
 
 function Diary() {
 
@@ -11,6 +12,10 @@ function Diary() {
     const [today, setToday]= useState(new Date());
     const [isModalNewTodo, setIsModalNewTodo] = useState(false);
     const [selectedDate, setSelectedDate] = useState( new Date ());
+    const [startOfMonth, setStartOfMonth] = useState(currentDate.clone().startOf('month').startOf('week'));
+    const [endOfMonth, setEndOfMonth] = useState(currentDate.clone().endOf('month').endOf('week'));
+
+    const topOfCalendarRef = useRef(null);
 
     const fetchtodos = () => {
         fetch('http://localhost:3000/api/todos')
@@ -24,11 +29,40 @@ function Diary() {
                     console.log('error getting datas', error)
                 })
         };
+
+    useEffect(() => {
+
+        // Function to update startOfMonth and endOfMonth based on currentDate
+        const updateStartAndEndOfMonth = () => {
+          let newStartOfMonth = currentDate.clone().startOf('month').startOf('week');
+          let newEndOfMonth = currentDate.clone().endOf('month').endOf('week');
     
-    // Get all the todos registered in database au lancement de la page
-    useEffect (() => {
+          if (window.matchMedia('(max-width:1023px)').matches) {
+            newStartOfMonth = currentDate.clone();
+            newEndOfMonth = currentDate.clone().endOf('month');
+          }
+    
+          setStartOfMonth(newStartOfMonth);
+          setEndOfMonth(newEndOfMonth);
+        };
+
+        // Get all the todos registered in database au lancement de la page
         fetchtodos();
-    }, [])
+        updateStartAndEndOfMonth();
+
+        // Scroll to the current month after updating startOfMonth and endOfMonth
+        if (topOfCalendarRef.current) {
+            setTimeout(() => {
+                const todayElement = topOfCalendarRef.current.querySelector('.today');
+                if (todayElement) {
+                    todayElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else {
+                    topOfCalendarRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
+        };
+      }, [currentDate]); 
+
     
     // Verifier si le mois precedent est decembre de l'annee precedente.
     const handlePrevMonth = () => {
@@ -37,7 +71,7 @@ function Diary() {
             setCurrentDate(currentDate.clone().subtract(1,'year').endOf('year'));
         }else{
             setCurrentDate(prevMonth)
-        }
+        } 
     };
 
     // Verifier si le mois suivant est janvier de l'annee suivante.
@@ -50,51 +84,46 @@ function Diary() {
         }
     };
 
-    // Affichage calendrier
-    const generateTwoWeeksCalendar = () => {
-
-        const startOfMonth = currentDate.clone().startOf('month').startOf('week');
-        const endOfMonth = currentDate.clone().endOf('month').endOf('week');
-        const calendar = [];
-        let week = [];
-
-        for (let day = startOfMonth.clone(); day.isBefore(endOfMonth); day.add(1, 'day')) {
-            const isInCurrentMonth = day.isSame(currentDate, 'month');
-            const isCurrentDate = day.isSame(today,'day')
-
-            week.push({
-                date:day.clone(), 
-                isInCurrentMonth: isInCurrentMonth,
-                isCurrentDate : isCurrentDate,
-                todos: [],});
-
-            if (week.length === 7 || day.isSame(endOfMonth, 'day')) {
-                calendar.push(week);
-                week = [];
-          }
+        // Affichage calendrier ecrans lg to 2xl (>1024px)
+        const generateCalendar = () => {
+            const calendar = [];
+            let week = [];
+    
+            for (let day = startOfMonth.clone(); day.isBefore(endOfMonth); day.add(1, 'day')) {
+                const isInCurrentMonth = day.isSame(currentDate, 'month');
+                const isCurrentDate = day.isSame(today,'day')
+    
+                week.push({
+                    date:day.clone(), 
+                    isInCurrentMonth: isInCurrentMonth,
+                    isCurrentDate : isCurrentDate,
+                    todos: [],});
+    
+                if (week.length === 7 || day.isSame(endOfMonth, 'day')) {
+                    calendar.push(week);
+                    week = [];
+              }
+            };
+    
+            // Associate todos with respective calendar days
+            calendar.forEach((week, weekIndex) => {
+                for (let items of week) {
+                    const formatedDate = items.date.format('L')
+                    const todosForDay = todosData.filter(e => moment(e.due_date).format('L') === formatedDate);
+                    if (todosForDay.length > 0) {
+                        items.todos= todosForDay.map(todo => ({
+                            id:todo.id,
+                            description:todo.description, 
+                            status:todo.status,
+                            due_date:todo.due_date,
+                        }))
+                    }  
+                } 
+            })
+            return calendar;
         };
 
-        // Associer les todos correspondantes a chaque jour du calendrier
-        calendar.forEach((week, weekIndex) => {
-            for (let items of week) {
-                const formatedDate = items.date.format('L')
-                const todosForDay = todosData.filter(e => moment(e.due_date).format('L') === formatedDate);
-                if (todosForDay.length > 0) {
-                    items.todos= todosForDay.map(todo => ({
-                        id:todo.id,
-                        description:todo.description, 
-                        status:todo.status,
-                        due_date:todo.due_date,
-                    }))
-                }  
-            } 
-        })
-        return calendar;
-    };
-
-    const calendar = generateTwoWeeksCalendar();
-
-
+    const calendar = generateCalendar();
 
     const handleClose = (status) => {
         setIsModalNewTodo(status)
@@ -102,6 +131,9 @@ function Diary() {
 
     const handleScrollUp = () => {
         console.log('click')
+        if (topOfCalendarRef.current){
+        topOfCalendarRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
     };
 
 
@@ -112,9 +144,10 @@ function Diary() {
                     const {date, isInCurrentMonth, isCurrentDate, todos} = dayInfo;
                     let todosToDisplay;
 
+                    const todayClass = isCurrentDate ? 'today' : '';
+
                     const handleAddTodo = () => {
                         setIsModalNewTodo(!isModalNewTodo);
-                        console.log('dayinfo', dayInfo.date)
                         setSelectedDate( dayInfo.date)
                     };
 
@@ -136,7 +169,7 @@ function Diary() {
                     });
 
                     return (
-                        <div key={dayIndex}>
+                        <div key={dayIndex} className={todayClass}>
                             <div className={`flex justify-start text-lg xs:text-xl lg:justify-between border-b-2 ${isCurrentDate ? 'border-b-2 border-indigo-600' : isInCurrentMonth ? 'text-slate-600  border-slate-600' : 'text-gray-400'}`}>
                                 <p className={` mr-4 mb-2 font-bold ${isCurrentDate ? ' font-bold text-indigo-600 border-indigo-600' : ''}`}>{date.format('DD')}.</p>
                                 <p className={`lg:max-2xl:hidden ${isCurrentDate ? 'text-indigo-600 font-bold' : ''}`}>{date.format('dddd')}</p>
@@ -164,8 +197,8 @@ function Diary() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                 </svg>
             </div>
-            <div className='overflow-y-auto h-96 grow'>
-                <div className='grid gap-4 grid-cols-1 lg:grid-cols-7 sm:gap-8'>
+            <div className='overflow-y-auto h-96 grow' >
+                <div className='grid gap-4 grid-cols-1 lg:grid-cols-7 sm:gap-8' ref={topOfCalendarRef}>
                         {calendarDisplay}
                 </div>
             </div>
@@ -185,3 +218,10 @@ function Diary() {
   
   export default Diary;
   
+
+//   if (topOfCalendarRef.current) {
+//     topOfCalendarRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+// } else if (currentDate.format('MMMM') === moment(today).format('MMMM')){
+//     const todayElement = document.querySelector('.today');
+//     todayElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
+// }
