@@ -92,11 +92,13 @@ function Diary() {
             for (let day = startOfMonth.clone(); day.isBefore(endOfMonth); day.add(1, 'day')) {
                 const isInCurrentMonth = day.isSame(currentDate, 'month');
                 const isCurrentDate = day.isSame(today,'day')
+                const isBeforeToday = day.isBefore(today,'day')
     
                 week.push({
                     date:day.clone(), 
                     isInCurrentMonth: isInCurrentMonth,
                     isCurrentDate : isCurrentDate,
+                    isBeforeToday : isBeforeToday,
                     todos: [],});
     
                 if (week.length === 7 || day.isSame(endOfMonth, 'day')) {
@@ -141,7 +143,7 @@ function Diary() {
         return (
             <React.Fragment key={weekIndex}>
                 {week.map((dayInfo,dayIndex) => { 
-                    const {date, isInCurrentMonth, isCurrentDate, todos} = dayInfo;
+                    const {date, isInCurrentMonth, isCurrentDate, isBeforeToday, todos} = dayInfo;
                     let todosToDisplay;
 
                     const todayClass = isCurrentDate ? 'today' : '';
@@ -154,14 +156,14 @@ function Diary() {
                     // Display todos for the day
                     if (todos.length > 0) {
                         todosToDisplay = todos.map((todo, todoIndex) => {
-                        return ( <Todo key={todoIndex} description={todo.description} {...todo} fetchtodos={fetchtodos}/>);
+                        return ( <Todo key={todoIndex} description={todo.description} id={todo.id} status={todo.status} {...todo} fetchtodos={fetchtodos}/>);
                         });
                     }
                     // Display empty lines 
                     const emptyLines = Array.from({length: (3-todos.length)}).map((_, index) => {
-                        return ( <div className = 'flex justify-start items-center border-b border-slate-200 mb-3 mt-3' key={index}>
+                        return ( <div className = 'flex justify-start items-center border-b border-neutral-300 mb-3 mt-3' key={index}>
                                     <svg    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" 
-                                            className="w-6 h-6 mb-3 stroke-slate-200 hover:cursor-pointer hover:stroke-sky-500"
+                                            className="w-6 h-6 mb-3 stroke-neutral-300 hover:cursor-pointer hover:stroke-indigo-500"
                                             onClick={() => handleAddTodo()}>
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                                     </svg>
@@ -170,10 +172,10 @@ function Diary() {
 
                     return (
                         <div key={dayIndex} className={todayClass}>
-                            <div className={`flex justify-start text-lg xs:text-xl lg:justify-between border-b-2 ${isCurrentDate ? 'border-b-2 border-indigo-600' : isInCurrentMonth ? 'text-slate-600  border-slate-600' : 'text-gray-400'}`}>
-                                <p className={` mr-4 mb-2 font-bold ${isCurrentDate ? ' font-bold text-indigo-600 border-indigo-600' : ''}`}>{date.format('DD')}.</p>
-                                <p className={`lg:max-2xl:hidden ${isCurrentDate ? 'text-indigo-600 font-bold' : ''}`}>{date.format('dddd')}</p>
-                                <p className={`hidden lg:max-2xl:inline ${isCurrentDate ? 'text-indigo-600 font-bold' : ''}`}>{date.format('ddd')}</p>
+                            <div className={`flex justify-start text-lg xs:text-xl lg:justify-between border-b-2 font-regular ${isCurrentDate && isInCurrentMonth ?' border-indigo-500': isBeforeToday ? 'text-neutral-300' : isInCurrentMonth ? 'text-neutral-600  border-neutral-600'  : 'text-neutral-300'}`}>
+                                <p className={` mr-4 mb-2 font-semibold ${isInCurrentMonth && isCurrentDate ? ' text-indigo-500' : ''}`}>{date.format('DD')}.</p>
+                                <p className={`lg:max-2xl:hidden ${isInCurrentMonth && isCurrentDate ? 'text-indigo-500 font-medium' : ''}`}>{date.format('dddd')}</p>
+                                <p className={`hidden lg:max-2xl:inline ${isInCurrentMonth && isCurrentDate ? 'text-indigo-500 font-medium' : ''}`}>{date.format('ddd')}</p>
 
                             </div>
                             {todosToDisplay}
@@ -185,29 +187,31 @@ function Diary() {
         )});
     
     return (
-        <div className=" bg-white rounded-lg p-5 pt-10 min-w-full h-full  flex flex-col justify-between ">
+        <div className=" bg-white shadow-2xl p-5 lg:pt-10 min-w-full h-full  flex flex-col justify-between ">
             <div className="flex justify-center items-center mb-5 lg:mb-11 ">
-                <svg    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 lg:w-10 lg:h-10 stroke-indigo-600 mr-5  hover:stroke-slate-500 cursor-pointer"
+                <svg    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 lg:w-8 lg:h-8 stroke-indigo-500 mr-5  hover:stroke-indigo-600 cursor-pointer"
                         onClick={()=>handlePrevMonth()} >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                 </svg>
-                <h2 className=" font-bold text-xl sm:text-2xl lg:text-4xl text-indigo-600">{(currentDate.format('MMMM YYYY')).charAt(0).toUpperCase()+(currentDate.format('MMMM YYYY')).slice(1)}</h2>
-                <svg    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 lg:w-10 lg:h-10 stroke-indigo-600 ml-5 hover:stroke-slate-500 cursor-pointer"
+                <h2 className=" font-medium text-xl sm:text-2xl lg:text-3xl text-indigo-500">{(currentDate.format('MMMM YYYY')).charAt(0).toUpperCase()+(currentDate.format('MMMM YYYY')).slice(1)}</h2>
+                <svg    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 lg:w-8 lg:h-8 stroke-indigo-500 ml-5 hover:stroke-indigo-600 cursor-pointer"
                         onClick={()=>handleNextMonth()}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                 </svg>
             </div>
-            <div className='overflow-y-auto h-96 grow' >
+            <div className='overflow-y-auto h-96 grow ::webkit-scrollbar' >
                 <div className='grid gap-4 grid-cols-1 lg:grid-cols-7 sm:gap-8' ref={topOfCalendarRef}>
                         {calendarDisplay}
                 </div>
             </div>
-            <div className='rounded-full bg-indigo-600 w-10 h-10 flex justify-center items-center lg:hidden'>
-                <svg    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" 
-                        className="w-6 h-6 stroke-white"
-                        onClick={() => handleScrollUp()}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
-                </svg>
+            <div className='flex justify-end'>
+                <div className='rounded-full bg-indigo-500 w-10 h-10 flex justify-center items-center lg:hidden'>
+                    <svg    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" 
+                            className="w-6 h-6 stroke-white"
+                            onClick={() => handleScrollUp()}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+                    </svg>
+                </div>
             </div>
             <React.Fragment>
                 {isModalNewTodo ? <ModalNewTodo onClose = {handleClose} due_date = {selectedDate} fetchtodos={fetchtodos}/> : null}
@@ -218,10 +222,3 @@ function Diary() {
   
   export default Diary;
   
-
-//   if (topOfCalendarRef.current) {
-//     topOfCalendarRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-// } else if (currentDate.format('MMMM') === moment(today).format('MMMM')){
-//     const todayElement = document.querySelector('.today');
-//     todayElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
-// }

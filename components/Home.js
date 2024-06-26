@@ -7,10 +7,10 @@ import Footer from './Footer';
 function Home() {
 
   return (
-    <div className='font-montserrat flex flex-col h-screen justify-between items-center bg-sky-500 text-base font-light p-5  xl:p-11'>
+    <div className='custom-gradient font-title flex flex-col h-screen justify-between items-center text-base font-light p-5  xl:p-11'>
         <Header/>
         <Diary/>
-        <Footer/>
+        {/* <Footer/> */}
     </div>
   );
 }

@@ -10,7 +10,7 @@ module.exports = {
     extend: {
       fontFamily : {
         'montserrat': ['Montserrat','sans-serif'],
-        'title': ['Readex Pro', 'sans-serif']
+        'title': ['Poppins', 'sans-serif']
       },
       screens : {
         'xs': '430px'
