@@ -12,7 +12,6 @@ function Todo(props) {
 
     // Change status of todo (change status to true or false)
     const handleCheck = () => {
-        setIsDone(!isDone)
 
         fetch(`http://localhost:8080/api/todos/${props.id}`,{
             method: 'PUT',
