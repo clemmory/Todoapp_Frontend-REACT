@@ -24,7 +24,7 @@ function Diary() {
                     // Sort todos by date
                     data.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
                     setTodosData(data);
-                    console.log(data)
+                    console.log("datas",data)
 
                 })
                 .catch(error => {
@@ -118,8 +118,8 @@ function Diary() {
                         items.todos= todosForDay.map(todo => ({
                             id:todo.id,
                             description:todo.description, 
-                            status:todo.status,
-                            due_date:todo.dueDate,
+                            completed:todo.completed,
+                            dueDate:todo.dueDate,
                         }))
                     }  
                 } 
@@ -158,7 +158,7 @@ function Diary() {
                     // Display todos for the day
                     if (todos.length > 0) {
                         todosToDisplay = todos.map((todo, todoIndex) => {
-                        return ( <Todo key={todoIndex} description={todo.description} id={todo.id} status={todo.status} {...todo} fetchtodos={fetchtodos}/>);
+                        return ( <Todo key={todoIndex} description={todo.description} id={todo.id} completed={todo.completed} dueDate={todo.dueDate} {...todo} fetchtodos={fetchtodos}/>);
                         });
                     }
                     // Display empty lines 
