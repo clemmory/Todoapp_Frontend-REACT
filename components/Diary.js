@@ -18,12 +18,14 @@ function Diary() {
     const topOfCalendarRef = useRef(null);
 
     const fetchtodos = () => {
-        fetch('http://localhost:3000/api/todos')
+        fetch('http://localhost:8080/api/todos/')
                 .then(response => response.json ())
                 .then(data => {
                     // Sort todos by date
-                    data.sort((a, b) => new Date(a.due_date) - new Date(b.due_date));
+                    data.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
                     setTodosData(data);
+                    console.log(data)
+
                 })
                 .catch(error => {
                     console.log('error getting datas', error)
@@ -67,7 +69,7 @@ function Diary() {
     // Verifier si le mois precedent est decembre de l'annee precedente.
     const handlePrevMonth = () => {
         const prevMonth = currentDate.clone().subtract(1,'month');
-        if (prevMonth.month() === 12){
+        if (prevMonth.month() === 11){
             setCurrentDate(currentDate.clone().subtract(1,'year').endOf('year'));
         }else{
             setCurrentDate(prevMonth)
@@ -111,13 +113,13 @@ function Diary() {
             calendar.forEach((week, weekIndex) => {
                 for (let items of week) {
                     const formatedDate = items.date.format('L')
-                    const todosForDay = todosData.filter(e => moment(e.due_date).format('L') === formatedDate);
+                    const todosForDay = todosData.filter(e => moment(e.dueDate).format('L') === formatedDate);
                     if (todosForDay.length > 0) {
                         items.todos= todosForDay.map(todo => ({
                             id:todo.id,
                             description:todo.description, 
                             status:todo.status,
-                            due_date:todo.due_date,
+                            due_date:todo.dueDate,
                         }))
                     }  
                 } 
@@ -214,7 +216,7 @@ function Diary() {
                 </div>
             </div>
             <React.Fragment>
-                {isModalNewTodo ? <ModalNewTodo onClose = {handleClose} due_date = {selectedDate} fetchtodos={fetchtodos}/> : null}
+                {isModalNewTodo ? <ModalNewTodo onClose = {handleClose} dueDate = {selectedDate} fetchtodos={fetchtodos}/> : null}
             </React.Fragment>
         </div>
     );

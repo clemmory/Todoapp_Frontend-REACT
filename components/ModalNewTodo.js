@@ -8,22 +8,24 @@ import 'moment/locale/es';
 function ModalNewTodo (props) {
 
     const [description, setDescription] = useState('');
-    const [date, setDate] = useState(props.due_date);
+    const [date, setDate] = useState(props.dueDate ||'');
+    const [tag, setTag] = useState([]);
 
 // Create todo when pressing button SAVE
     const createTodo = () => {
-        fetch(`http://localhost:3000/api/todos/`,{
+        fetch(`http://localhost:8080/api/todos/`,{
           method: 'POST',
           headers: { 'Content-Type' : 'application/json'},
-          body: JSON.stringify({due_date: moment(date).format('L'),
+          body: JSON.stringify({dueDate: moment(date).format('YYYY-MM-DD'),
                                 description: description,
-                                status: false})
+                                done: false,
+                                tags: tag})
         })
         . then (response => {
           if (!response.ok) {
             throw new Error ('Update error')
           }
-          return response;
+          return response.json();
         })
         .then (() => {
           props.onClose(false);
@@ -74,7 +76,7 @@ function ModalNewTodo (props) {
                   className="border rounded p-2  text-neutral-600  outline-indigo-500 text-base"/>
           <div className="flex justify-evenly">
             <button className=" w-1/3 text-indigo-500 font-semibold hover:text-indigo-600  text-base mt-8"
-                    onClick={() => createTodo()}>CREATE</button>
+                  onClick={() => createTodo()}>CREATE</button>
           </div>
         </div>
     </div>

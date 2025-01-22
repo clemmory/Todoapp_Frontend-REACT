@@ -8,7 +8,7 @@ function ModalTodo(props) {
 
     const [description, setDescription] = useState(props.description);
     const [date, setDate] = useState(props.due_date);
-    const [tag, setTag] = useState('');
+    const [tag, setTag] = useState([]);
 
     // Remove tag associated with todo
     const removeTag = () => {
@@ -17,10 +17,13 @@ function ModalTodo(props) {
 
     // Save changes done in db
     const saveChanges = () => {
-            fetch (`http://localhost:3000/api/todos/${props.id}`,{
+            fetch (`http://localhost:8080/api/todos/${props.id}`,{
                 method: 'PUT',
                 headers: { 'Content-Type' : 'application/json'},
-                body: JSON.stringify({due_date: date, description: description, status: props.status})
+                body: JSON.stringify({dueDate: moment(date).format('YYYY-MM-DD'), 
+                                      description: description, 
+                                      done: props.done, 
+                                      tags: tag})
             })
                 . then (response => {
                     if (!response.ok) {

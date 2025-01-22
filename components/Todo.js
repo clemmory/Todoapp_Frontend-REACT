@@ -14,7 +14,7 @@ function Todo(props) {
     const handleCheck = () => {
         setIsDone(!isDone)
 
-        fetch(`http://localhost:3000/api/todos/${props.id}`,{
+        fetch(`http://localhost:8080/api/todos/${props.id}`,{
             method: 'PUT',
             headers: { 'Content-Type' : 'application/json'},
             body: JSON.stringify({  due_date: moment(props.due_date).format('L'),
@@ -34,7 +34,7 @@ function Todo(props) {
 
     // Delete todo from db
     const handleDelete = () => {
-        fetch(`http://localhost:3000/api/todos/${props.id}`,{
+        fetch(`http://localhost:8080/api/todos/${props.id}`,{
             method: 'DELETE',
         })
         .then (() => {
